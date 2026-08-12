@@ -1,0 +1,25 @@
+name: Process WhatsApp Reminders
+
+on:
+  # El disparador `schedule` se desactivó a propósito: GitHub Actions no
+  # garantiza el intervalo configurado (se observaron corridas separadas por
+  # ~2 horas en vez de 5 minutos, ver README sección "Cómo disparar el cron
+  # gratis") y, mientras estuvo activo junto con cron-job.org, ambos podían
+  # llamar a /api/cron/process-reminders casi al mismo tiempo y duplicar el
+  # envío de un mismo recordatorio. cron-job.org es ahora el único disparador
+  # programado. Se deja `workflow_dispatch` para poder correrlo a mano si
+  # hace falta probar el endpoint sin depender de cron-job.org.
+  workflow_dispatch: {}
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar al endpoint de procesamiento de recordatorios
+        run: |
+          curl -sf --max-time 60 -X POST "${BACKEND_URL}/api/cron/process-reminders" \
+            -H "x-api-key: ${API_KEY}" \
+            -H "Content-Type: application/json"
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          API_KEY: ${{ secrets.API_KEY }}

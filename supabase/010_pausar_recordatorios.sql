@@ -1,0 +1,15 @@
+-- =========================================================
+-- Reminders App - Migración: estado "pausado" para recordatorios.
+-- Ejecutar en el SQL Editor de Supabase DESPUÉS de las migraciones
+-- anteriores.
+--
+-- Un recordatorio pausado no se toca en processPendingReminders() (que
+-- solo mira estado = 'pendiente'), pero conserva toda su configuración
+-- para poder reanudarlo después en vez de tener que cancelarlo y volver a
+-- crearlo. Se usa quan se desvincula el número de WhatsApp de un usuario
+-- (todos sus recordatorios 'pendiente' pasan a 'pausado' automáticamente,
+-- y vuelven a 'pendiente' solos al reconectar), y también manualmente
+-- desde "Mi perfil" (pausar/reanudar todos) o por recordatorio individual
+-- si es recurrente.
+-- =========================================================
+alter type public.estado_recordatorio add value if not exists 'pausado';
